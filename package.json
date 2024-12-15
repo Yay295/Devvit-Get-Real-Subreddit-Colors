@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "devvit-get-real-subreddit-colors",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "repository": "github:Yay295/Devvit-Get-Real-Subreddit-Colors",
+  "type": "module",
+  "dependencies": {
+    "@devvit/public-api": ">=0.11.0",
+    "jsdom": "^ 24 25"
+  },
+  "devDependencies": {
+    "@types/cssom": "^0.4.0",
+    "@types/jsdom": "^24",
+    "typescript": "5.3.2"
+  }
+}
