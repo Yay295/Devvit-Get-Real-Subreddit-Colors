@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import { JSDOM } from 'jsdom';
-import { CSSStyleSheet, CSSStyleRule } from 'cssom';
+import { parseHTML } from 'linkedom';
+import { CSSStyleSheet, CSSRule, CSSStyleRule } from 'cssom';
 import assert from 'node:assert';
 
 // It looks like we're trying to import from this same file, but TypeScript
@@ -51,9 +51,9 @@ export async function getRealSubredditColors(subreddit_name,redis) {
 	if (cached_colors) return cached_colors;
 
 	const html = await fetch('https://sh.reddit.com/r/' + subreddit_name).then(r => r.text());
-	const dom = new JSDOM(html);
-	const style_element = /** @type {HTMLStyleElement} */ (dom.window.document.getElementById('community-styles-style-element'));
-	// The JSDOM/CSSOM CSSStyleSheet is not quite the same as the spec CSSStyleSheet.
+	const { document } = parseHTML(html);
+	const style_element = /** @type {HTMLStyleElement} */ (document.getElementById('community-styles-style-element'));
+	// The CSSOM CSSStyleSheet is not quite the same as the spec CSSStyleSheet.
 	const stylesheet = /** @type {CSSStyleSheet} */ (/** @type {any} */ (style_element.sheet));
 	const rules = Array.from(
 		stylesheet.cssRules
@@ -62,7 +62,6 @@ export async function getRealSubredditColors(subreddit_name,redis) {
 		 * @param {CSSRule} rule
 		 * @returns {rule is CSSStyleRule}
 		 */
-		// @ts-ignore
 		rule => rule.constructor.name === 'CSSStyleRule'
 	).map(rule => {
 		// Parse Selector
