@@ -3,6 +3,14 @@ import { JSDOM } from 'jsdom';
 import { CSSStyleSheet, CSSStyleRule } from 'cssom';
 import assert from 'node:assert';
 
+// It looks like we're trying to import from this same file, but TypeScript
+// will actually try to import the types from the index.d.ts file instead.
+/** @import { CSSPropertyName, Styles } from './index.js' */
+/** @import { type getCachedColors as GetCachedColorsType } from './index.js' */
+/** @import { type colorsHaveChanged as ColorsHaveChangedType } from './index.js' */
+/** @import { type getRealSubredditColors as GetRealSubredditColorsType } from './index.js' */
+
+
 Devvit.configure({
 	http: true
 });
@@ -11,35 +19,8 @@ export const REDIS_KEY = 'DEVVIT_REAL_SUBREDDIT_COLORS';
 
 const CUSTOM_ASSERTION_ERROR = new assert.AssertionError();
 
-/**
- * @typedef {import('@devvit/public-api').RedisClient} RedisClient
- */
 
-/**
- * Reddit currently has 6 style rule blocks:
- * default and explicit light,
- * default and explicit light stickied,
- * browser style dark and not explicit light,
- * browser style dark and not explicit light stickied,
- * explicit dark,
- * explicit dark stickied.
- * The last two pairs use the same colors.
- * @typedef {'light' | 'light stickied' | 'dark' | 'dark stickied'} Styles
- */
-
-/**
- * @typedef {`--${string}`} CSSPropertyName
- */
-
-/**
- * @typedef {{[style in Styles]: CSSPropertyName[]}} RealSubredditColors
- */
-
-
-/**
- * @param {?RedisClient} [redis]
- * @returns {Promise<?RealSubredditColors>}
- */
+/** @type GetCachedColorsType */
 async function getCachedColors(redis) {
 	if (redis) {
 		const colors = await redis.get(REDIS_KEY);
@@ -50,12 +31,7 @@ async function getCachedColors(redis) {
 	return null;
 }
 
-/**
- * Checks if the old and new colors are different.
- * @param {RealSubredditColors} old_colors 
- * @param {RealSubredditColors} new_colors 
- * @returns {boolean}
- */
+/** @type ColorsHaveChangedType */
 function colorsHaveChanged(old_colors,new_colors) {
 	try {
 		// this throws when the colors *are* equal
@@ -69,12 +45,7 @@ function colorsHaveChanged(old_colors,new_colors) {
 	}
 }
 
-/**
- * Gets the real colors used on Sh / Shiny / New New Reddit.
- * @param {string} subreddit_name - The name of the subreddit to get the colors for.
- * @param {?RedisClient} [redis] - The redis client. If given, this function will first attempt to get the cached color from redis before trying to get them from the subreddit.
- * @returns {Promise<RealSubredditColors>}
- */
+/** @type GetRealSubredditColorsType */
 export async function getRealSubredditColors(subreddit_name,redis) {
 	const cached_colors = await getCachedColors(redis);
 	if (cached_colors) return cached_colors;
