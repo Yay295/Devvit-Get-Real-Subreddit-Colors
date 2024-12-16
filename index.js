@@ -16,10 +16,18 @@ Devvit.configure({
 
 export const REDIS_KEY = 'DEVVIT_REAL_SUBREDDIT_COLORS';
 
+function redisIsEnabled() {
+	try {
+		return Boolean(/** @type {any} */ (Devvit).redisPlugin);
+	} catch (e) {
+		return false;
+	}
+}
+
 
 /** @type GetCachedColorsType */
 async function getCachedColors(redis) {
-	if (redis) {
+	if (redis && redisIsEnabled()) {
 		const colors = await redis.get(REDIS_KEY);
 		if (colors) {
 			return JSON.parse(colors);
