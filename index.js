@@ -107,5 +107,3 @@ Devvit.addTrigger({
 		}
 	}
 });
-
-export default Devvit;
