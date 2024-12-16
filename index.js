@@ -1,13 +1,12 @@
 import { Devvit } from '@devvit/public-api';
 import { parseHTML } from 'linkedom';
 import { CSSStyleSheet, CSSRule, CSSStyleRule } from 'cssom';
-import assert from 'node:assert';
+import util from 'util';
 
 // It looks like we're trying to import from this same file, but TypeScript
 // will actually try to import the types from the index.d.ts file instead.
 /** @import { CSSPropertyName, Styles } from './index.js' */
 /** @import { type getCachedColors as GetCachedColorsType } from './index.js' */
-/** @import { type colorsHaveChanged as ColorsHaveChangedType } from './index.js' */
 /** @import { type getRealSubredditColors as GetRealSubredditColorsType } from './index.js' */
 
 
@@ -16,8 +15,6 @@ Devvit.configure({
 });
 
 export const REDIS_KEY = 'DEVVIT_REAL_SUBREDDIT_COLORS';
-
-const CUSTOM_ASSERTION_ERROR = new assert.AssertionError();
 
 
 /** @type GetCachedColorsType */
@@ -29,20 +26,6 @@ async function getCachedColors(redis) {
 		}
 	}
 	return null;
-}
-
-/** @type ColorsHaveChangedType */
-function colorsHaveChanged(old_colors,new_colors) {
-	try {
-		// this throws when the colors *are* equal
-		assert.notDeepStrictEqual(old_colors,new_colors,CUSTOM_ASSERTION_ERROR);
-		return true;
-	} catch (e) {
-		if (e === CUSTOM_ASSERTION_ERROR) {
-			return false;
-		}
-		throw new Error('An error occurred while checking if the current subreddit colors have changed since they were last cached.', { cause: e });
-	}
 }
 
 /** @type GetRealSubredditColorsType */
@@ -113,7 +96,7 @@ Devvit.addTrigger({
 		let colors_have_changed = true;
 
 		if (cached_colors) {
-			colors_have_changed = colorsHaveChanged(cached_colors,new_colors);
+			colors_have_changed = !util.isDeepStrictEqual(cached_colors,new_colors);
 			if (colors_have_changed) {
 				context.redis.set(REDIS_KEY,JSON.stringify(new_colors));
 			}

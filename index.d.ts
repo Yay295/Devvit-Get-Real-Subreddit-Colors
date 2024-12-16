@@ -20,9 +20,6 @@ import { RedisClient } from '@devvit/public-api';
 
 export function getCachedColors(redis?: RedisClient | null): Promise<RealSubredditColors | null>;
 
-/** Checks if the old and new colors are different. */
-export function colorsHaveChanged(old_colors: RealSubredditColors, new_colors: RealSubredditColors): boolean;
-
 /**
  * Gets the real colors used on Sh / Shiny / New New Reddit.
  * @param subreddit_name - The name of the subreddit to get the colors for.
