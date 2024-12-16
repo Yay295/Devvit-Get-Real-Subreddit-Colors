@@ -1,6 +1,6 @@
-This is a library for Devvit - Reddit's Developer Platform.
+This is a library for [Devvit - Reddit's Developer Platform](https://developers.reddit.com/).
 
-Provides a function
+It provides a function
 ```ts
 getRealSubredditColors(subreddit_name: string, redis?: RedisClient): Promise<RealSubredditColors>
 ```
