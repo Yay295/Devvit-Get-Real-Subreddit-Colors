@@ -7,6 +7,7 @@
   "type": "module",
   "dependencies": {
     "@devvit/public-api": ">=0.11.0",
+    "dequal": "latest",
     "linkedom": "^0.18.0"
   },
   "devDependencies": {

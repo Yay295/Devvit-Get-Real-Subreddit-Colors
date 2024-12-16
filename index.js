@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 import { parseHTML } from 'linkedom';
 import { CSSStyleSheet, CSSRule, CSSStyleRule } from 'cssom';
-import util from 'util';
+import { dequal } from 'dequal';
 
 // It looks like we're trying to import from this same file, but TypeScript
 // will actually try to import the types from the index.d.ts file instead.
@@ -96,7 +96,7 @@ Devvit.addTrigger({
 		let colors_have_changed = true;
 
 		if (cached_colors) {
-			colors_have_changed = !util.isDeepStrictEqual(cached_colors,new_colors);
+			colors_have_changed = !dequal(cached_colors,new_colors);
 			if (colors_have_changed) {
 				context.redis.set(REDIS_KEY,JSON.stringify(new_colors));
 			}
