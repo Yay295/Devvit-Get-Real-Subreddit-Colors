@@ -89,6 +89,10 @@ Devvit.addTrigger({
 	events: ['AppInstall','AppUpgrade','ModAction'],
 	onEvent: async (event,context) => {
 		// https://developers.reddit.com/docs/mod_actions/
+		if (event.type === 'ModAction' && event.action === 'community_colors_changed') {
+			console.log('Detected own event dispatch!');
+			return;
+		}
 		if (event.type === 'ModAction' && event.action !== 'community_styling') {
 			return;
 		}
@@ -110,8 +114,16 @@ Devvit.addTrigger({
 			}
 		}
 
-		if (colors_have_changed) {
-			// TODO emit custom event with color values
+		if (colors_have_changed && event.type === 'ModAction') {
+			console.log('Subreddit Style Colors Have Changed', new_colors);
+
+			event.action = 'community_colors_changed';
+
+			/** @type {import('@devvit/public-api').TriggerOnEventHandler<import('@devvit/protos').ModAction>[]} */
+			const handlers = (/** @type {any} */ (Devvit)).triggerOnEventHandlers.get(event.type);
+			const results = await Promise.allSettled(handlers.map(handler => handler(event,context)));
+			const errors = results.filter(result => result.status === 'rejected').map(result => result.reason);
+			if (errors) throw new AggregateError(errors);
 		}
 	}
 });
